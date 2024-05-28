@@ -15,13 +15,13 @@ clock = pygame.time.Clock()
 
 running = True
 while running:
-	clock.tick(FPS)
-
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
 
 	screen.fill(BLACK)
 	pygame.display.flip()
+
+	clock.tick(FPS)
 
 pygame.quit()
