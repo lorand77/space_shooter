@@ -1,3 +1,4 @@
+from typing import Any
 import pygame
 
 WIDTH = 480
@@ -10,6 +11,8 @@ pygame.display.set_caption("Space Shooter")
 clock = pygame.time.Clock()
 
 background = pygame.image.load("assets/starfield.png").convert()
+pygame.joystick.init()
+joystick = pygame.joystick.Joystick(0)
 
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
@@ -20,6 +23,18 @@ class Player(pygame.sprite.Sprite):
 		self.rect.centerx = WIDTH / 2
 		self.rect.bottom = HEIGHT - 30
 
+	def update(self):
+		self.rect.x += joystick.get_axis(0) * 8
+		self.rect.y += joystick.get_axis(1) * 5
+		if self.rect.right > WIDTH:
+			self.rect.right = WIDTH
+		if self.rect.left < 0:
+			self.rect.left = 0
+		if self.rect.bottom > HEIGHT:
+			self.rect.bottom = HEIGHT
+		if self.rect.top < HEIGHT * 3 / 4:
+			self.rect.top = HEIGHT * 3 / 4
+
 sprites_all = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
@@ -29,6 +44,8 @@ while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
+
+	sprites_all.update()
 
 	screen.blit(background, background.get_rect())
 	sprites_all.draw(screen)
