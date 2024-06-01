@@ -1,3 +1,4 @@
+from typing import Any
 import pygame
 
 WIDTH = 480
@@ -34,6 +35,20 @@ class Player(pygame.sprite.Sprite):
 		if self.rect.top < HEIGHT * 3 / 4:
 			self.rect.top = HEIGHT * 3 / 4
 
+class PlayerBullet(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("assets/laserBlue.png").convert_alpha()
+		self.image = pygame.transform.scale(self.image, (7, 25))
+		self.rect = self.image.get_rect()
+		self.rect.centerx = x
+		self.rect.bottom = y
+
+	def update(self):
+		self.rect.y -= 10
+		if self.rect.bottom < 0:
+			self.kill()
+
 sprites_all = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
@@ -43,6 +58,9 @@ while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
+		if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+			player_bullet = PlayerBullet(player.rect.centerx, player.rect.top)
+			sprites_all.add(player_bullet)
 
 	sprites_all.update()
 
