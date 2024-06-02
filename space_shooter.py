@@ -93,10 +93,15 @@ sprites_player_bullets = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
 
-for i in range(2):
+def enemy_create():
 	enemy = Enemy()
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
+
+for i in range(2):
+	enemy_create()
+
+enemies_killed = 0
 
 running = True
 while running:
@@ -112,9 +117,10 @@ while running:
 
 	hits = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
 	for hit in hits:
-		enemy = Enemy()
-		sprites_all.add(enemy)
-		sprites_enemies.add(enemy)
+		enemy_create()
+		enemies_killed += 1
+		if enemies_killed % 5 == 0:
+			enemy_create()
 
 	screen.blit(background, background.get_rect())
 	sprites_all.draw(screen)
