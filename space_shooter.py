@@ -45,7 +45,7 @@ class PlayerBullet(pygame.sprite.Sprite):
 		self.rect.bottom = y
 
 	def update(self):
-		self.rect.y -= 10
+		self.rect.y -= 15
 		if self.rect.bottom < 0:
 			self.kill()
 
@@ -57,22 +57,23 @@ class Enemy(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.centerx = random.randint(50, WIDTH - 50)
 		self.rect.top = random.randint(30, 100)
-		self.vx = random.gauss(0, 4)
-		self.vy = random.gauss(0, 3)
+		self.vx = random.uniform(-6, 6)
+		self.vy = random.uniform(-4, 4)
 
 	def update(self):
-		self.rect.x += self.vx
-		self.rect.y += self.vy
 		self.vx += random.gauss(0, 0.2)
 		self.vy += random.gauss(0, 0.15)
 		if self.vx > 6:
 			self.vx = 6
 		if self.vx < -6:
 			self.vx = -6
-		if self.vy > 5:
-			self.vy = 5
-		if self.vy < -5:
-			self.vy = -5
+		if self.vy > 4:
+			self.vy = 4
+		if self.vy < -4:
+			self.vy = -4
+		
+		self.rect.x += self.vx
+		self.rect.y += self.vy
 		if self.rect.right > WIDTH:
 			self.rect.right = WIDTH
 			self.vx = -self.vx * 0.8
