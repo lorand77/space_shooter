@@ -56,9 +56,9 @@ class Enemy(pygame.sprite.Sprite):
 		self.image = pygame.transform.scale(self.image, (51, 42))
 		self.rect = self.image.get_rect()
 		self.rect.centerx = random.randint(50, WIDTH - 50)
-		self.rect.top = random.randint(30, 100)
+		self.rect.top = 0
 		self.vx = random.uniform(-6, 6)
-		self.vy = random.uniform(-4, 4)
+		self.vy = random.uniform(0, 4)
 
 	def update(self):
 		self.vx += random.gauss(0, 0.2)
@@ -88,12 +88,15 @@ class Enemy(pygame.sprite.Sprite):
 			self.vy = -self.vy * 0.8
 
 sprites_all = pygame.sprite.Group()
+sprites_enemies = pygame.sprite.Group()
+sprites_player_bullets = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
 
 for i in range(2):
 	enemy = Enemy()
 	sprites_all.add(enemy)
+	sprites_enemies.add(enemy)
 
 running = True
 while running:
@@ -103,8 +106,15 @@ while running:
 		if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
 			player_bullet = PlayerBullet(player.rect.centerx, player.rect.top)
 			sprites_all.add(player_bullet)
+			sprites_player_bullets.add(player_bullet)
 
 	sprites_all.update()
+
+	hits = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
+	for hit in hits:
+		enemy = Enemy()
+		sprites_all.add(enemy)
+		sprites_enemies.add(enemy)
 
 	screen.blit(background, background.get_rect())
 	sprites_all.draw(screen)
