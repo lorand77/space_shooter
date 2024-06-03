@@ -22,8 +22,19 @@ class Player(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.centerx = WIDTH / 2
 		self.rect.bottom = HEIGHT - 30
+		self.health = 100
+		self.last_heal_time = pygame.time.get_ticks()
+		self.heal_delay = 300
 
-	def update(self):
+	def heal(self):
+		now = pygame.time.get_ticks()
+		if now - self.last_heal_time > self.heal_delay:
+			self.last_heal_time = now
+			self.health += 1
+			if self.health > 100:
+				self.health = 100
+
+	def move(self):
 		self.rect.x += joystick.get_axis(0) * 8
 		self.rect.y += joystick.get_axis(1) * 5
 		if self.rect.right > WIDTH:
@@ -34,6 +45,10 @@ class Player(pygame.sprite.Sprite):
 			self.rect.bottom = HEIGHT
 		if self.rect.top < HEIGHT * 3 / 4:
 			self.rect.top = HEIGHT * 3 / 4
+
+	def update(self):
+		self.heal()
+		self.move()
 
 class PlayerBullet(pygame.sprite.Sprite):
 	def __init__(self, x, y):
@@ -128,6 +143,17 @@ def enemy_create():
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
 
+def draw_health_bar(surf, x, y, health):
+	if health < 0:
+		health = 0
+	BAR_LENGHT = 100
+	BAR_HEIGHT = 10
+	fill = health / 100 * BAR_LENGHT
+	outline_rect = pygame.Rect(x, y, BAR_LENGHT, BAR_HEIGHT)
+	fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+	pygame.draw.rect(surf, "green", fill_rect)
+	pygame.draw.rect(surf, "white", outline_rect, 2)
+
 for i in range(2):
 	enemy_create()
 
@@ -145,15 +171,22 @@ while running:
 
 	sprites_all.update()
 
-	hits = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
-	for hit in hits:
+	hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
+	for hit in hits_enemy:
 		enemy_create()
 		enemies_killed += 1
 		if enemies_killed % 5 == 0:
 			enemy_create()
 
+	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
+	if hits_player:
+		player.health -= 20
+		if player.health <= 0:
+			running = False
+
 	screen.blit(background, background.get_rect())
 	sprites_all.draw(screen)
+	draw_health_bar(screen, 5, 5, player.health)
 	pygame.display.flip()
 
 	clock.tick(FPS)
