@@ -59,8 +59,10 @@ class Enemy(pygame.sprite.Sprite):
 		self.rect.top = 0
 		self.vx = random.uniform(-6, 6)
 		self.vy = random.uniform(0, 4)
+		self.shoot_delay = random.uniform(500, 1000)
+		self.last_shot_time = pygame.time.get_ticks()
 
-	def update(self):
+	def move(self):
 		self.vx += random.gauss(0, 0.2)
 		self.vy += random.gauss(0, 0.15)
 		if self.vx > 6:
@@ -87,9 +89,37 @@ class Enemy(pygame.sprite.Sprite):
 			self.rect.top = 0
 			self.vy = -self.vy * 0.8
 
+	def shoot(self):
+		now = pygame.time.get_ticks()
+		if now - self.last_shot_time > self.shoot_delay:
+			self.last_shot_time = now
+			enemy_bullet = EnemyBullet(self.rect.centerx, self.rect.bottom)
+			sprites_all.add(enemy_bullet)
+			sprites_enemy_bullets.add(enemy_bullet)
+
+	def update(self):
+		self.move()
+		self.shoot()
+
+class EnemyBullet(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = pygame.image.load("assets/laserRed.png").convert_alpha()
+		self.image = pygame.transform.scale(self.image, (7, 25))
+		self.image = pygame.transform.flip(self.image, False, True)
+		self.rect = self.image.get_rect()
+		self.rect.centerx = x
+		self.rect.top = y
+
+	def update(self):
+		self.rect.y += 12
+		if self.rect.top > HEIGHT:
+			self.kill()
+
 sprites_all = pygame.sprite.Group()
 sprites_enemies = pygame.sprite.Group()
 sprites_player_bullets = pygame.sprite.Group()
+sprites_enemy_bullets = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
 
