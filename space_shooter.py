@@ -138,7 +138,7 @@ sprites_enemy_bullets = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
 
-def enemy_create():
+def create_enemy():
 	enemy = Enemy()
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
@@ -154,10 +154,19 @@ def draw_health_bar(surf, x, y, health):
 	pygame.draw.rect(surf, "green", fill_rect)
 	pygame.draw.rect(surf, "white", outline_rect, 2)
 
+def draw_text(surf, text, size, x, y):
+	font_name = pygame.font.match_font("Comic Sans MS")
+	font = pygame.font.Font(font_name, size)
+	text_surf = font.render(text, True, "white")
+	text_rect = text_surf.get_rect()
+	text_rect.topright = (x, y)
+	surf.blit(text_surf, text_rect)
+
 for i in range(2):
-	enemy_create()
+	create_enemy()
 
 enemies_killed = 0
+score = 0
 
 running = True
 while running:
@@ -173,10 +182,11 @@ while running:
 
 	hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
 	for hit in hits_enemy:
-		enemy_create()
+		create_enemy()
 		enemies_killed += 1
 		if enemies_killed % 5 == 0:
-			enemy_create()
+			create_enemy()
+		score += 100
 
 	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 	if hits_player:
@@ -187,6 +197,7 @@ while running:
 	screen.blit(background, background.get_rect())
 	sprites_all.draw(screen)
 	draw_health_bar(screen, 5, 5, player.health)
+	draw_text(screen, str(score), 15, WIDTH - 15, 5)
 	pygame.display.flip()
 
 	clock.tick(FPS)
