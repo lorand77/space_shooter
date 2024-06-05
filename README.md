@@ -1,1 +1,1 @@
-!(assets/gameplay.png)
+![](assets/gameplay.png)
