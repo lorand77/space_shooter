@@ -8,9 +8,14 @@ FPS = 60
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Shooter")
+background = pygame.image.load("assets/starfield.png").convert()
+
 clock = pygame.time.Clock()
 
-background = pygame.image.load("assets/starfield.png").convert()
+pygame.mixer.init()
+sound_shoot = pygame.mixer.Sound("assets/pew.wav")
+sound_enemy_expl = pygame.mixer.Sound("assets/expl.wav")
+
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(0)
 
@@ -177,6 +182,7 @@ while running:
 			player_bullet = PlayerBullet(player.rect.centerx, player.rect.top)
 			sprites_all.add(player_bullet)
 			sprites_player_bullets.add(player_bullet)
+			sound_shoot.play()
 
 	sprites_all.update()
 
@@ -187,6 +193,7 @@ while running:
 		if enemies_killed % 5 == 0:
 			create_enemy()
 		score += 100
+		sound_enemy_expl.play()
 
 	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 	if hits_player:
@@ -202,4 +209,5 @@ while running:
 
 	clock.tick(FPS)
 
+pygame.time.wait(4000)
 pygame.quit()
