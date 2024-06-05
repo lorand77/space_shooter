@@ -148,6 +148,9 @@ def create_enemy():
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
 
+for i in range(2):
+	create_enemy()
+
 def draw_health_bar(surf, x, y, health):
 	if health < 0:
 		health = 0
@@ -166,9 +169,6 @@ def draw_text(surf, text, size, x, y):
 	text_rect = text_surf.get_rect()
 	text_rect.topright = (x, y)
 	surf.blit(text_surf, text_rect)
-
-for i in range(2):
-	create_enemy()
 
 enemies_killed = 0
 score = 0
