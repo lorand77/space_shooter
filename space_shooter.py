@@ -148,7 +148,10 @@ def create_enemy():
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
 
-for i in range(2):
+enemies_level = 2
+enemies_now = enemies_level
+
+for i in range(enemies_level):
 	create_enemy()
 
 def draw_health_bar(surf, x, y, health):
@@ -170,7 +173,6 @@ def draw_text(surf, text, size, x, y):
 	text_rect.topright = (x, y)
 	surf.blit(text_surf, text_rect)
 
-enemies_killed = 0
 score = 0
 
 running = True
@@ -188,10 +190,12 @@ while running:
 
 	hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
 	for hit in hits_enemy:
-		create_enemy()
-		enemies_killed += 1
-		if enemies_killed % 5 == 0:
-			create_enemy()
+		enemies_now -= 1
+		if enemies_now == 0:
+			enemies_level += 1
+			for i in range(enemies_level):
+				create_enemy()
+			enemies_now = enemies_level
 		score += 100
 		sound_enemy_expl.play()
 
