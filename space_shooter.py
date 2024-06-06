@@ -33,7 +33,7 @@ class Player(pygame.sprite.Sprite):
 
 	def heal(self):
 		now = pygame.time.get_ticks()
-		if now - self.last_heal_time > self.heal_delay:
+		if now - self.last_heal_time > self.heal_delay and enemies_now > 1:
 			self.last_heal_time = now
 			self.health += 1
 			if self.health > 100:
