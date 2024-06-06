@@ -143,13 +143,15 @@ sprites_enemy_bullets = pygame.sprite.Group()
 player = Player()
 sprites_all.add(player)
 
+enemies_now = 0
+enemies_level = 2
+
 def create_enemy():
+	global enemies_now
 	enemy = Enemy()
+	enemies_now += 1
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
-
-enemies_level = 2
-enemies_now = enemies_level
 
 for i in range(enemies_level):
 	create_enemy()
@@ -195,7 +197,6 @@ while running:
 			enemies_level += 1
 			for i in range(enemies_level):
 				create_enemy()
-			enemies_now = enemies_level
 		score += 100
 		sound_enemy_expl.play()
 
