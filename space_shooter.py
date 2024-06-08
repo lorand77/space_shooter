@@ -27,6 +27,8 @@ class Player(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.centerx = WIDTH / 2
 		self.rect.bottom = HEIGHT - 30
+		self.vx = 0
+		self.vy = 0
 		self.health = 100
 		self.last_heal_time = pygame.time.get_ticks()
 		self.heal_delay = 300
@@ -40,8 +42,10 @@ class Player(pygame.sprite.Sprite):
 				self.health = 100
 
 	def move(self):
-		self.rect.x += joystick.get_axis(0) * 8
-		self.rect.y += joystick.get_axis(1) * 5
+		self.vx = joystick.get_axis(0) * 8
+		self.vy = joystick.get_axis(1) * 5
+		self.rect.x += self.vx
+		self.rect.y += self.vy
 		if self.rect.right > WIDTH:
 			self.rect.right = WIDTH
 		if self.rect.left < 0:
@@ -63,9 +67,12 @@ class PlayerBullet(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.centerx = x
 		self.rect.bottom = y
+		self.vx = player.vx * 0.4
+		self.vy = -15 + player.vy * 0.4
 
 	def update(self):
-		self.rect.y -= 15
+		self.rect.x += self.vx
+		self.rect.y += self.vy
 		if self.rect.bottom < 0:
 			self.kill()
 
@@ -113,7 +120,7 @@ class Enemy(pygame.sprite.Sprite):
 		now = pygame.time.get_ticks()
 		if now - self.last_shot_time > self.shoot_delay:
 			self.last_shot_time = now
-			enemy_bullet = EnemyBullet(self.rect.centerx, self.rect.bottom)
+			enemy_bullet = EnemyBullet(self.rect.centerx, self.rect.bottom, self.vx, self.vy)
 			sprites_all.add(enemy_bullet)
 			sprites_enemy_bullets.add(enemy_bullet)
 
@@ -122,7 +129,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.shoot()
 
 class EnemyBullet(pygame.sprite.Sprite):
-	def __init__(self, x, y):
+	def __init__(self, x, y, vx, vy):
 		pygame.sprite.Sprite.__init__(self)
 		self.image = pygame.image.load("assets/laserRed.png").convert_alpha()
 		self.image = pygame.transform.scale(self.image, (7, 25))
@@ -130,9 +137,12 @@ class EnemyBullet(pygame.sprite.Sprite):
 		self.rect = self.image.get_rect()
 		self.rect.centerx = x
 		self.rect.top = y
+		self.vx = vx*0.4
+		self.vy = vy*0.4
 
 	def update(self):
-		self.rect.y += 12
+		self.rect.x += self.vx
+		self.rect.y += 12 + self.vy
 		if self.rect.top > HEIGHT:
 			self.kill()
 
