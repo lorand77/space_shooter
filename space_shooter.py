@@ -187,6 +187,10 @@ def draw_text(surf, text, size, x, y):
 
 score = 0
 
+scroll_speed = 1
+bg_y1 = 0
+bg_y2 = -HEIGHT
+
 running = True
 while running:
 	for event in pygame.event.get():
@@ -216,10 +220,25 @@ while running:
 		if player.health <= 0:
 			running = False
 
-	screen.blit(background, background.get_rect())
+	if player.vy > 3:
+		scroll_speed = 0
+	elif player.vy < -3:
+		scroll_speed = 2
+	else:
+		scroll_speed = 1
+	
+	bg_y1 += scroll_speed
+	bg_y2 += scroll_speed
+	if bg_y1 > HEIGHT:
+		bg_y1 = -HEIGHT
+	if bg_y2 > HEIGHT:
+		bg_y2 = -HEIGHT
+
+	screen.blit(background, (0,bg_y1))
+	screen.blit(background, (0,bg_y2))
 	sprites_all.draw(screen)
-	draw_health_bar(screen, 5, 5, player.health)
-	draw_text(screen, str(score), 15, WIDTH - 15, 5)
+	draw_health_bar(screen, 8, 8, player.health)
+	draw_text(screen, str(score), 15, WIDTH - 12, 6)
 	pygame.display.flip()
 
 	clock.tick(FPS)
