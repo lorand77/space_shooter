@@ -221,11 +221,11 @@ while running:
 			running = False
 
 	if player.vy > 3:
-		scroll_speed = 0
-	elif player.vy < -3:
-		scroll_speed = 2
-	else:
 		scroll_speed = 1
+	elif player.vy < -3:
+		scroll_speed = 3
+	else:
+		scroll_speed = 2
 	
 	bg_y1 += scroll_speed
 	bg_y2 += scroll_speed
