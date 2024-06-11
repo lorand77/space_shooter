@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 WIDTH = 480
 HEIGHT = 600
@@ -62,13 +63,15 @@ class Player(pygame.sprite.Sprite):
 class PlayerBullet(pygame.sprite.Sprite):
 	def __init__(self, x, y):
 		pygame.sprite.Sprite.__init__(self)
+		self.vx = player.vx * 0.4
+		self.vy = -15 + player.vy * 0.4
 		self.image = pygame.image.load("assets/laserBlue.png").convert_alpha()
 		self.image = pygame.transform.scale(self.image, (7, 25))
+		angle = math.atan(self.vx / self.vy)*90 / (math.pi / 2)
+		self.image = pygame.transform.rotate(self.image, angle)
 		self.rect = self.image.get_rect()
 		self.rect.centerx = x
 		self.rect.bottom = y
-		self.vx = player.vx * 0.4
-		self.vy = -15 + player.vy * 0.4
 
 	def update(self):
 		self.rect.x += self.vx
@@ -131,18 +134,20 @@ class Enemy(pygame.sprite.Sprite):
 class EnemyBullet(pygame.sprite.Sprite):
 	def __init__(self, x, y, vx, vy):
 		pygame.sprite.Sprite.__init__(self)
+		self.vx = vx*0.4
+		self.vy = 12 + vy*0.4
 		self.image = pygame.image.load("assets/laserRed.png").convert_alpha()
 		self.image = pygame.transform.scale(self.image, (7, 25))
 		self.image = pygame.transform.flip(self.image, False, True)
+		angle = math.atan(self.vx / self.vy)*90 / (math.pi / 2)
+		self.image = pygame.transform.rotate(self.image, angle)
 		self.rect = self.image.get_rect()
 		self.rect.centerx = x
 		self.rect.top = y
-		self.vx = vx*0.4
-		self.vy = vy*0.4
 
 	def update(self):
 		self.rect.x += self.vx
-		self.rect.y += 12 + self.vy
+		self.rect.y += self.vy
 		if self.rect.top > HEIGHT:
 			self.kill()
 
@@ -219,6 +224,7 @@ while running:
 		player.health -= 20
 		if player.health <= 0:
 			running = False
+			pygame.time.wait(4000)
 
 	if player.vy > 3:
 		scroll_speed = 1
@@ -243,5 +249,4 @@ while running:
 
 	clock.tick(FPS)
 
-pygame.time.wait(4000)
 pygame.quit()
