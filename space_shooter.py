@@ -13,7 +13,13 @@ FPS = 60
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Shooter")
+
 background = pygame.image.load("assets/starfield.png").convert()
+explosion_anim = []
+for i in range(9):
+	img = pygame.image.load(f"assets/regularExplosion0{i}.png").convert_alpha()
+	img = pygame.transform.scale(img, (50, 50))
+	explosion_anim.append(img)
 
 clock = pygame.time.Clock()
 
@@ -155,6 +161,30 @@ class EnemyBullet(pygame.sprite.Sprite):
 		if self.rect.top > HEIGHT:
 			self.kill()
 
+class Explosion(pygame.sprite.Sprite):
+	def __init__(self, x, y):
+		pygame.sprite.Sprite.__init__(self)
+		self.image = explosion_anim[0]
+		self.rect = self.image.get_rect()
+		self.rect.center = (x, y)
+		self.frame = 0
+		self.last_update_time = pygame.time.get_ticks()
+		self.frame_rate_millis = 50
+
+
+	def update(self):
+		now = pygame.time.get_ticks()
+		if now - self.last_update_time > self.frame_rate_millis:
+			self.last_update_time = now
+			self.frame += 1
+			if self.frame < len(explosion_anim):
+				old_center = self.rect.center
+				self.image = explosion_anim[self.frame]
+				self.rect = self.image.get_rect()
+				self.rect.center = old_center
+			else:
+				self.kill()
+
 sprites_all = pygame.sprite.Group()
 sprites_enemies = pygame.sprite.Group()
 sprites_player_bullets = pygame.sprite.Group()
@@ -222,7 +252,9 @@ while running:
 				create_enemy()
 		score += 100
 		sound_enemy_expl.play()
-
+		explosion = Explosion(hit.rect.centerx, hit.rect.centery)
+		sprites_all.add(explosion)
+		
 	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 	if hits_player:
 		player.health -= 20
