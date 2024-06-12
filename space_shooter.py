@@ -1,3 +1,7 @@
+# Space Shooter by Lorand
+# based on tutorial from kidscancode.org
+# Art from Kenney.nl
+
 import pygame
 import random
 import math
