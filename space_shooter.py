@@ -43,6 +43,7 @@ class Player(pygame.sprite.Sprite):
 		self.health = 100
 		self.last_heal_time = pygame.time.get_ticks()
 		self.heal_delay = 300
+		self.is_alive = True
 
 	def heal(self):
 		now = pygame.time.get_ticks()
@@ -252,16 +253,26 @@ while running:
 				create_enemy()
 		score += 100
 		sound_enemy_expl.play()
-		explosion = Explosion(hit.rect.centerx, hit.rect.centery)
-		sprites_all.add(explosion)
+		enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
+		sprites_all.add(enemy_explosion)
 		
 	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 	if hits_player:
 		player.health -= 20
 		if player.health <= 0:
+			sound_enemy_expl.play()     # TODO: change to separate player explosion
+			player_explosion = Explosion(player.rect.centerx, player.rect.centery)
+			sprites_all.add(player_explosion)
+			player.is_alive = False
+			player.death_time = pygame.time.get_ticks()
+			player.kill()
+			player.rect.center = (-1000, -1000)      # hack
+			
+	if not player.is_alive and not player_explosion.alive():
+		now = pygame.time.get_ticks()
+		if now - player.death_time > 2000:
 			running = False
-			pygame.time.wait(4000)
-
+	
 	if player.vy > 3:
 		scroll_speed = 1
 	elif player.vy < -3:
