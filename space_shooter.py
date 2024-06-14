@@ -186,25 +186,12 @@ class Explosion(pygame.sprite.Sprite):
 			else:
 				self.kill()
 
-sprites_all = pygame.sprite.Group()
-sprites_enemies = pygame.sprite.Group()
-sprites_player_bullets = pygame.sprite.Group()
-sprites_enemy_bullets = pygame.sprite.Group()
-player = Player()
-sprites_all.add(player)
-
-enemies_now = 0
-enemies_level = 2
-
 def create_enemy():
 	global enemies_now
 	enemy = Enemy()
 	enemies_now += 1
 	sprites_all.add(enemy)
 	sprites_enemies.add(enemy)
-
-for i in range(enemies_level):
-	create_enemy()
 
 def draw_health_bar(surf, x, y, health):
 	if health < 0:
@@ -225,75 +212,102 @@ def draw_text(surf, text, size, x, y):
 	text_rect.topright = (x, y)
 	surf.blit(text_surf, text_rect)
 
-score = 0
-
-scroll_speed = 1
-bg_y1 = 0
-bg_y2 = -HEIGHT
-
+main_menu = True
 running = True
 while running:
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			running = False
-		if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
-			player_bullet = PlayerBullet(player.rect.centerx, player.rect.top)
-			sprites_all.add(player_bullet)
-			sprites_player_bullets.add(player_bullet)
-			sound_shoot.play()
-
-	sprites_all.update()
-
-	hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
-	for hit in hits_enemy:
-		enemies_now -= 1
-		if enemies_now == 0:
-			enemies_level += 1
-			for i in range(enemies_level):
-				create_enemy()
-		score += 100
-		sound_enemy_expl.play()
-		enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
-		sprites_all.add(enemy_explosion)
+	if main_menu:
+		screen.blit(background, (0, 0))
+		draw_text(screen, "Space Shooter", 50, WIDTH / 8*7, HEIGHT / 4)
+		pygame.display.flip()
 		
-	hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
-	if hits_player:
-		player.health -= 20
-		if player.health <= 0:
-			sound_enemy_expl.play()     # TODO: change to separate player explosion
-			player_explosion = Explosion(player.rect.centerx, player.rect.centery)
-			sprites_all.add(player_explosion)
-			player.is_alive = False
-			player.death_time = pygame.time.get_ticks()
-			player.kill()
-			player.rect.center = (-1000, -1000)      # hack
-			
-	if not player.is_alive and not player_explosion.alive():
-		now = pygame.time.get_ticks()
-		if now - player.death_time > 2000:
-			running = False
-	
-	if player.vy > 3:
-		scroll_speed = 1
-	elif player.vy < -3:
-		scroll_speed = 3
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT or (event.type == pygame.JOYBUTTONDOWN and event.button == 2):
+				running = False
+			if event.type == pygame.JOYBUTTONDOWN and event.button == 1:
+				main_menu = False
+				
+				sprites_all = pygame.sprite.Group()
+				sprites_enemies = pygame.sprite.Group()
+				sprites_player_bullets = pygame.sprite.Group()
+				sprites_enemy_bullets = pygame.sprite.Group()
+				player = Player()
+				sprites_all.add(player)
+
+				enemies_now = 0
+				enemies_level = 2
+				for i in range(enemies_level):
+					create_enemy()
+				
+				score = 0
+				scroll_speed = 1
+				bg_y1 = 0
+				bg_y2 = -HEIGHT
+
+		clock.tick(FPS)
+
 	else:
-		scroll_speed = 2
-	
-	bg_y1 += scroll_speed
-	bg_y2 += scroll_speed
-	if bg_y1 > HEIGHT:
-		bg_y1 = -HEIGHT
-	if bg_y2 > HEIGHT:
-		bg_y2 = -HEIGHT
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				running = False
+			if event.type == pygame.JOYBUTTONDOWN and event.button == 0:
+				player_bullet = PlayerBullet(player.rect.centerx, player.rect.top)
+				sprites_all.add(player_bullet)
+				sprites_player_bullets.add(player_bullet)
+				sound_shoot.play()
 
-	screen.blit(background, (0,bg_y1))
-	screen.blit(background, (0,bg_y2))
-	sprites_all.draw(screen)
-	draw_health_bar(screen, 8, 8, player.health)
-	draw_text(screen, str(score), 15, WIDTH - 12, 6)
-	pygame.display.flip()
+		sprites_all.update()
 
-	clock.tick(FPS)
+		hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
+		for hit in hits_enemy:
+			enemies_now -= 1
+			if enemies_now == 0:
+				enemies_level += 1
+				for i in range(enemies_level):
+					create_enemy()
+			score += 100
+			sound_enemy_expl.play()
+			enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
+			sprites_all.add(enemy_explosion)
+			
+		hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
+		if hits_player:
+			player.health -= 20
+			if player.health <= 0:
+				sound_enemy_expl.play()     # TODO: change to separate player explosion
+				player_explosion = Explosion(player.rect.centerx, player.rect.centery)
+				sprites_all.add(player_explosion)
+				player.is_alive = False
+				player.death_time = pygame.time.get_ticks()
+				player.kill()
+				player.rect.center = (-1000, -1000)      # hack
+				
+		if not player.is_alive and not player_explosion.alive():
+			now = pygame.time.get_ticks()
+			if now - player.death_time > 2000:
+				# running = False
+				main_menu = True
+		
+		if player.vy > 3:
+			scroll_speed = 1
+		elif player.vy < -3:
+			scroll_speed = 3
+		else:
+			scroll_speed = 2
+		
+		bg_y1 += scroll_speed
+		bg_y2 += scroll_speed
+		if bg_y1 > HEIGHT:
+			bg_y1 = -HEIGHT
+		if bg_y2 > HEIGHT:
+			bg_y2 = -HEIGHT
+
+		screen.blit(background, (0,bg_y1))
+		screen.blit(background, (0,bg_y2))
+		sprites_all.draw(screen)
+		draw_health_bar(screen, 8, 8, player.health)
+		draw_text(screen, str(score), 15, WIDTH - 12, 6)
+		pygame.display.flip()
+
+		clock.tick(FPS)
 
 pygame.quit()
