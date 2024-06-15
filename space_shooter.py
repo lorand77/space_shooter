@@ -274,16 +274,16 @@ while running:
 		hits_enemy = pygame.sprite.groupcollide(sprites_enemies, sprites_player_bullets, dokilla = True, dokillb = True)
 		for hit in hits_enemy:
 			enemies_now -= 1
+			sound_expl.play()
+			enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
+			sprites_all.add(enemy_explosion)
+			score += 100
 			if enemies_now == 0:
 				enemies_level += 1
 				for i in range(enemies_level):
 					create_enemy()
 				player.health = 100
-			score += 100
-			sound_expl.play()
-			enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
-			sprites_all.add(enemy_explosion)
-			
+				
 		hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 		if hits_player:
 			player.health -= 20
@@ -301,6 +301,8 @@ while running:
 			if now - player.death_time > 2000:
 				# running = False
 				main_menu = True
+				if score > high_score:
+					high_score = score
 		
 		if player.vy > 3:
 			scroll_speed = 1
