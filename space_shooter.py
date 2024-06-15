@@ -227,14 +227,14 @@ running = True
 while running:
 	if main_menu:
 		screen.blit(background, (0, 0))
-		draw_text(screen, "Space Shooter", 50, WIDTH / 2, HEIGHT * 0.25, "center")
-		draw_text(screen, f"Last score: {score}", 20, WIDTH / 2, HEIGHT * 0.4, "center")
-		draw_text(screen, f"High score: {high_score}", 20, WIDTH / 2, HEIGHT * 0.45, "center")
-		draw_text(screen, "Controls (Xbox):", 20, WIDTH / 2, HEIGHT * 0.55, "center")
-		draw_text(screen, "B to start game", 20, WIDTH / 2, HEIGHT * 0.65, "center")
-		draw_text(screen, "X to exit game", 20, WIDTH / 2, HEIGHT * 0.7, "center")
-		draw_text(screen, "A to shoot", 20, WIDTH / 2, HEIGHT * 0.8, "center")
-		draw_text(screen, "LS to move the ship", 20, WIDTH / 2, HEIGHT * 0.85, "center")
+		draw_text(screen, "Space Shooter", 50, WIDTH / 2, HEIGHT * 0.2, "center")
+		draw_text(screen, f"Last score: {score}", 20, WIDTH / 2, HEIGHT * 0.35, "center")
+		draw_text(screen, f"High score: {high_score}", 20, WIDTH / 2, HEIGHT * 0.4, "center")
+		draw_text(screen, "Controls (Xbox):", 20, WIDTH / 2, HEIGHT * 0.53, "center")
+		draw_text(screen, "B to start game", 20, WIDTH / 2, HEIGHT * 0.6, "center")
+		draw_text(screen, "X to exit game", 20, WIDTH / 2, HEIGHT * 0.65, "center")
+		draw_text(screen, "A to shoot", 20, WIDTH / 2, HEIGHT * 0.72, "center")
+		draw_text(screen, "LS to move the ship", 20, WIDTH / 2, HEIGHT * 0.77, "center")
 		pygame.display.flip()
 		
 		for event in pygame.event.get():
@@ -308,7 +308,7 @@ while running:
 					high_score = score
 					with open("high_score.txt", "w") as f:
 						f.write(str(high_score))
-						
+
 		if player.vy > 3:
 			scroll_speed = 1
 		elif player.vy < -3:
