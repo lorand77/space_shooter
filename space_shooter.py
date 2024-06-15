@@ -25,7 +25,7 @@ clock = pygame.time.Clock()
 
 pygame.mixer.init()
 sound_shoot = pygame.mixer.Sound("assets/pew.wav")
-sound_enemy_expl = pygame.mixer.Sound("assets/expl.wav")
+sound_expl = pygame.mixer.Sound("assets/expl.wav")
 
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(0)
@@ -47,7 +47,7 @@ class Player(pygame.sprite.Sprite):
 
 	def heal(self):
 		now = pygame.time.get_ticks()
-		if now - self.last_heal_time > self.heal_delay and enemies_now > 1:
+		if now - self.last_heal_time > self.heal_delay:
 			self.last_heal_time = now
 			self.health += 1
 			if self.health > 100:
@@ -204,20 +204,34 @@ def draw_health_bar(surf, x, y, health):
 	pygame.draw.rect(surf, "green", fill_rect)
 	pygame.draw.rect(surf, "white", outline_rect, 2)
 
-def draw_text(surf, text, size, x, y):
+def draw_text(surf, text, size, x, y, align):
 	font_name = pygame.font.match_font("Comic Sans MS")
 	font = pygame.font.Font(font_name, size)
 	text_surf = font.render(text, True, "white")
 	text_rect = text_surf.get_rect()
-	text_rect.topright = (x, y)
+	if align == "center":
+		text_rect.center = (x, y)
+	elif align == "topright":
+		text_rect.topright = (x, y)
+	else:
+		text_rect.topleft = (x, y)
 	surf.blit(text_surf, text_rect)
 
+score = 0
+high_score = 0
 main_menu = True
 running = True
 while running:
 	if main_menu:
 		screen.blit(background, (0, 0))
-		draw_text(screen, "Space Shooter", 50, WIDTH / 8*7, HEIGHT / 4)
+		draw_text(screen, "Space Shooter", 50, WIDTH / 2, HEIGHT * 0.25, "center")
+		draw_text(screen, f"Last score: {score}", 20, WIDTH / 2, HEIGHT * 0.4, "center")
+		draw_text(screen, f"High score: {high_score}", 20, WIDTH / 2, HEIGHT * 0.45, "center")
+		draw_text(screen, "Controls (Xbox):", 20, WIDTH / 2, HEIGHT * 0.55, "center")
+		draw_text(screen, "B to start game", 20, WIDTH / 2, HEIGHT * 0.65, "center")
+		draw_text(screen, "X to exit game", 20, WIDTH / 2, HEIGHT * 0.7, "center")
+		draw_text(screen, "A to shoot", 20, WIDTH / 2, HEIGHT * 0.8, "center")
+		draw_text(screen, "LS to move the ship", 20, WIDTH / 2, HEIGHT * 0.85, "center")
 		pygame.display.flip()
 		
 		for event in pygame.event.get():
@@ -264,8 +278,9 @@ while running:
 				enemies_level += 1
 				for i in range(enemies_level):
 					create_enemy()
+				player.health = 100
 			score += 100
-			sound_enemy_expl.play()
+			sound_expl.play()
 			enemy_explosion = Explosion(hit.rect.centerx, hit.rect.centery)
 			sprites_all.add(enemy_explosion)
 			
@@ -273,7 +288,7 @@ while running:
 		if hits_player:
 			player.health -= 20
 			if player.health <= 0:
-				sound_enemy_expl.play()     # TODO: change to separate player explosion
+				sound_expl.play()
 				player_explosion = Explosion(player.rect.centerx, player.rect.centery)
 				sprites_all.add(player_explosion)
 				player.is_alive = False
@@ -305,7 +320,7 @@ while running:
 		screen.blit(background, (0,bg_y2))
 		sprites_all.draw(screen)
 		draw_health_bar(screen, 8, 8, player.health)
-		draw_text(screen, str(score), 15, WIDTH - 12, 6)
+		draw_text(screen, str(score), 15, WIDTH - 12, 6, "topright")
 		pygame.display.flip()
 
 		clock.tick(FPS)
