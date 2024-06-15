@@ -21,6 +21,9 @@ for i in range(9):
 	img = pygame.transform.scale(img, (50, 50))
 	explosion_anim.append(img)
 
+with open("high_score.txt", "r") as f:
+	high_score = int(f.read())
+
 clock = pygame.time.Clock()
 
 pygame.mixer.init()
@@ -218,9 +221,9 @@ def draw_text(surf, text, size, x, y, align):
 	surf.blit(text_surf, text_rect)
 
 score = 0
-high_score = 0
 main_menu = True
 running = True
+
 while running:
 	if main_menu:
 		screen.blit(background, (0, 0))
@@ -303,7 +306,9 @@ while running:
 				main_menu = True
 				if score > high_score:
 					high_score = score
-		
+					with open("high_score.txt", "w") as f:
+						f.write(str(high_score))
+						
 		if player.vy > 3:
 			scroll_speed = 1
 		elif player.vy < -3:
