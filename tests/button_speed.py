@@ -33,6 +33,8 @@ sound_expl = pygame.mixer.Sound("assets/expl.wav")
 pygame.joystick.init()
 joystick = pygame.joystick.Joystick(0)
 
+button_presses = []
+
 class Player(pygame.sprite.Sprite):
 	def __init__(self):
 		pygame.sprite.Sprite.__init__(self)
@@ -271,6 +273,7 @@ while running:
 				sprites_all.add(player_bullet)
 				sprites_player_bullets.add(player_bullet)
 				sound_shoot.play()
+				button_presses.append(pygame.time.get_ticks())
 
 		sprites_all.update()
 
@@ -333,3 +336,20 @@ while running:
 		clock.tick(FPS)
 
 pygame.quit()
+
+
+import matplotlib.pyplot as plt
+import statistics
+
+button_presses_diffs = []
+for i in range(0,len(button_presses)-1):
+	button_presses_diffs.append(button_presses[i+1] - button_presses[i])
+
+print(sorted(button_presses_diffs))
+print(statistics.median(button_presses_diffs))
+
+plt.plot(button_presses_diffs)
+plt.show()
+
+plt.hist(button_presses_diffs)
+plt.show()
