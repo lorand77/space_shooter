@@ -104,7 +104,7 @@ class Enemy(pygame.sprite.Sprite):
 		self.vx = random.uniform(-6, 6)
 		self.vy = random.uniform(0, 4)
 		self.shoot_delay = random.uniform(500, 1000)
-		self.last_shot_time = pygame.time.get_ticks()
+		self.last_shot_time = pygame.time.get_ticks() + random.uniform(0, 300)
 
 	def move(self):
 		self.vx += random.gauss(0, 0.2)
