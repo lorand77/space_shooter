@@ -286,6 +286,7 @@ while running:
 				for i in range(enemies_level):
 					create_enemy()
 				player.health = 100
+				score += 500
 				
 		hits_player = pygame.sprite.spritecollide(player, sprites_enemy_bullets, dokill = True)
 		if hits_player:
