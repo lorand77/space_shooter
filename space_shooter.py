@@ -303,7 +303,6 @@ while running:
 		if not player.is_alive and not player_explosion.alive():
 			now = pygame.time.get_ticks()
 			if now - player.death_time > 2000:
-				# running = False
 				main_menu = True
 				if score > high_score:
 					high_score = score
